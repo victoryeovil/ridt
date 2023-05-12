@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h1>View Blog</h1>
+      <h3>{{ blog.title }}</h3>
+      <p>{{ blog.content }}</p>
+
+      <hr>
+
+      <h3>Comments:</h3>
+      <ul id="comment-list" class="list-group">
+        {% for comment in blog.comments.all %}
+          <li class="list-group-item">
+            <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
+          </li>
+        {% empty %}
+          <li class="list-group-item">No comments yet.</li>
+        {% endfor %}
+      </ul>
+
+      <hr>
+
+      <h3>Add a Comment:</h3>
+      <form id="comment-form" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="comment-text">Comment:</label>
+          <textarea id="comment-text" name="comment-text" class="form-control" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+  // Submit comment form using AJAX
+  $('#comment-form').submit(function(event) {
+    event.preventDefault();
+    var commentText = $('#comment-text').val();
+    $.ajax({
+      url: "{% url 'create_comment' blog.id %}",
+      type: "POST",
+      data: { "comment-text": commentText },
+      dataType: "json",
+      success: function(response) {
+        // Add new comment to the list
+        var commentItem = $('<li class="list-group-item"></li>').text(response.username + ': ' + response.comment);
+        $('#comment-list').append(commentItem);
+        // Clear comment text area
+        $('#comment-text').val('');
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

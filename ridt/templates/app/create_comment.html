@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Admin</h1>
+  <h2>All Blogs:</h2>
+  {% for blog in blogs %}
+    <h3>{{ blog.title }}</h3>
+    <p>{{ blog.content }}</p>
+    <a href="{% url 'app:update_blog' blog.id %}">Edit</a>
+    <a href="{% url 'app:delete_blog' blog.id %}">Delete</a>
+    <hr>
+  {% empty %}
+    <p>No blogs found.</p>
+  {% endfor %}
+
+  <h2>All Comments:</h2>
+  {% for comment in comments %}
+    <p>{{ comment.text }}</p>
+    <a href="{% url 'app:delete_comment' comment.id %}">Delete</a>
+    <hr>
+  {% empty %}
+    <p>No comments found.</p>
+  {% endfor %}
+
+  <h2>All Users:</h2>
+  {% for user in users %}
+    <p>{{ user.username }}</p>
+    <a href="{% url 'app:delete_user' user.id %}">Delete</a>
+    <hr>
+  {% empty %}
+    <p>No users found.</p>
+  {% endfor %}
+</div>
+{% endblock %}

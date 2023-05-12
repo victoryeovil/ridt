@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Comment on Blog</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="comment">Your Comment:</label>
+      <textarea id="comment" name="comment" class="form-control" rows="4" required></textarea>
+    </div>
+    <input type="submit" value="Submit" class="btn btn-primary">
+  </form>
+</div>
+{% endblock %}
