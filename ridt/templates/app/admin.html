@@ -16,6 +16,7 @@
     <hr>
   {% empty %}
     <p>No blogs found.</p>
+      <a href="{% url 'create_blog'  %}" class="btn btn-primary">Create</a>
   {% endfor %}
 
   <h2>All Comments:</h2>

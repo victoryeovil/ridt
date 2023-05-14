@@ -4,20 +4,26 @@ from django.contrib.auth.decorators import login_required
 from .models import Blog, Comment, User
 from .forms import BlogForm, CommentForm, CustomUserCreationForm
 from django.utils import timezone
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 # Create your views here.
 def login_view(request):
-        if request.method == 'POST':
-            username = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('website:index')
-            else:
-                return render(request, 'app/login.html', {'error': 'Invalid login credentials'})
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('website:index')
         else:
-            return render(request, 'app/login.html')
+            return render(request, 'app/login.html', {'error': 'Invalid login credentials'})
+    else:
+        return render(request, 'app/login.html')
+
 
 def logout_view(request):
     logout(request)
@@ -42,6 +48,7 @@ def dashboard(request):
     users = User.objects.exclude(id=request.user.id)
     return render(request, 'app/dashboard.html', {'blogs': blogs, 'comments': comments, 'users': users})
 
+
 @login_required
 def create_blog(request):
     if request.method == 'POST':
@@ -54,6 +61,7 @@ def create_blog(request):
     else:
         form = BlogForm()
     return render(request, 'app/create_blog.html', {'form': form})
+
 
 @login_required
 def read_blog(request, blog_id):
@@ -81,6 +89,7 @@ def view_blog(request, blog_id):
 
     return render(request, 'app/view_blog.html', {'blog': blog, 'comments': comments})
 
+
 @login_required
 def update_blog(request, blog_id):
     blog = get_object_or_404(Blog, id=blog_id)
@@ -95,11 +104,13 @@ def update_blog(request, blog_id):
         form = BlogForm(instance=blog)
     return render(request, 'app/update_blog.html', {'form': form})
 
+
 @login_required
 def delete_blog(request, blog_id):
     blog = get_object_or_404(Blog, id=blog_id)
     blog.delete()
     return redirect('dashboard')
+
 
 @login_required
 def create_comment(request, blog_id):
@@ -116,6 +127,7 @@ def create_comment(request, blog_id):
         form = CommentForm()
     return render(request, 'app/create_comment.html', {'form': form, 'blog': blog})
 
+
 @login_required
 def admin(request):
     if not request.user.is_superuser:
@@ -126,16 +138,19 @@ def admin(request):
         users = User.objects.all()
     return render(request, 'app/admin.html', {'blogs': blogs, 'comments': comments, 'users': users})
 
+
 @login_required
 def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     user.delete()
-    return redirect('admin')
+    return redirect('dashboard')
+
 
 @login_required
 def view_all_blogs(request):
     blogs = Blog.objects.all()
     return render(request, 'app/view_all_blogs.html', {'blogs': blogs})
+
 
 @login_required
 def comment_on_blog(request, blog_id):
@@ -150,6 +165,6 @@ def comment_on_blog(request, blog_id):
             comment.save()
             return redirect('view_all_blogs')
     else:
-        return redirect('view_all_blogs')
+        form = CommentForm()
 
     return render(request, 'app/comment.html', {'blog': blog, 'form': form})
